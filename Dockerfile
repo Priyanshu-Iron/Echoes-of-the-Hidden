@@ -1,22 +1,34 @@
 # Stage 1: Build the React App
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --production=false
 
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve with Nginx
-FROM nginx:alpine
+# Stage 2: Production Node.js server
+FROM node:18-alpine
 
-# Copy built assets from builder stage
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-# Expose port (Google Cloud Run typically expects 8080)
-EXPOSE 80
+# Copy server files
+COPY server/package*.json ./server/
+RUN cd server && npm ci --production
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Copy server source and built frontend
+COPY server/ ./server/
+COPY --from=build /app/dist ./dist
+
+# Copy env file if present (Cloud Run uses env vars instead)
+COPY .env* ./
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+# Start the Express server (serves API + static files)
+CMD ["node", "server/index.js"]

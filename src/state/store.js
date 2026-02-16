@@ -1,20 +1,34 @@
+/**
+ * Global game state management using Zustand.
+ * Handles player state, world state, missions, UI, and game events.
+ * 
+ * @module state/store
+ */
+
 import { create } from 'zustand';
+import { PLAYER_SPAWN, canMoveTo } from '../game/mapData';
+import {
+  PLAYER_SPEED, DEFAULT_REPUTATION, MAX_REPUTATION, MIN_REPUTATION, MAX_SUSPICION,
+  PLAYER_HALF_WIDTH, PLAYER_HALF_HEIGHT,
+} from '../game/constants';
+import { logNPCInteraction, logMissionStarted, logMissionCompleted, logSuspicionMaxed } from '../services/firebase';
 
 export const useGameStore = create((set, get) => ({
   // --- PLAYER STATE ---
   player: {
-    x: 100,
-    y: 100,
-    speed: 4,
-    reputation: 50, // 0-100, starts neutral
+    x: PLAYER_SPAWN.x,
+    y: PLAYER_SPAWN.y,
+    speed: PLAYER_SPEED,
+    reputation: DEFAULT_REPUTATION,
     inventory: [],
+    direction: 0,
   },
   
   // --- WORLD STATE ---
   world: {
-    suspicion: 0, // 0-100, global alarm level
-    guards: [], // Array of guard objects
-    npcs: [],   // Array of NPC objects
+    suspicion: 0,
+    guards: [],
+    npcs: [],
   },
 
   // --- MISSION STATE ---
@@ -28,38 +42,96 @@ export const useGameStore = create((set, get) => ({
     dialogue: {
       isOpen: false,
       npcId: null,
-      messages: [], // { sender: 'player' | 'npc', text: '' }
+      npcName: '',
+      npcRole: '',
+      messages: [],
     }
   },
 
   // --- ACTIONS ---
-  
-  // Player Actions
-  movePlayer: (dx, dy) => set((state) => ({
-    player: { ...state.player, x: state.player.x + dx, y: state.player.y + dy }
-  })),
 
+  /**
+   * Move player by delta, checking wall collisions.
+   * Supports wall-sliding when movement is partially blocked.
+   * @param {number} dx - Horizontal movement delta.
+   * @param {number} dy - Vertical movement delta.
+   */
+  movePlayer: (dx, dy) => set((state) => {
+    const newX = state.player.x + dx;
+    const newY = state.player.y + dy;
+    
+    if (!canMoveTo(newX, newY, PLAYER_HALF_WIDTH, PLAYER_HALF_HEIGHT)) {
+      const canX = canMoveTo(newX, state.player.y, PLAYER_HALF_WIDTH, PLAYER_HALF_HEIGHT);
+      const canY = canMoveTo(state.player.x, newY, PLAYER_HALF_WIDTH, PLAYER_HALF_HEIGHT);
+      
+      if (canX) {
+        return {
+          player: { ...state.player, x: newX, direction: Math.atan2(0, dx) }
+        };
+      }
+      if (canY) {
+        return {
+          player: { ...state.player, y: newY, direction: Math.atan2(dy, 0) }
+        };
+      }
+      return state;
+    }
+
+    return {
+      player: {
+        ...state.player,
+        x: newX,
+        y: newY,
+        direction: Math.atan2(dy, dx),
+      }
+    };
+  }),
+
+  /** Set player position directly (used by save/load). */
   setPlayerPosition: (x, y) => set((state) => ({
     player: { ...state.player, x, y }
   })),
 
+  /**
+   * Update player reputation clamped to [0, 100].
+   * @param {number} amount - Reputation change (positive or negative).
+   */
   updateReputation: (amount) => set((state) => ({
-    player: { ...state.player, reputation: Math.max(0, Math.min(100, state.player.reputation + amount)) }
+    player: {
+      ...state.player,
+      reputation: Math.max(MIN_REPUTATION, Math.min(MAX_REPUTATION, state.player.reputation + amount))
+    }
   })),
 
-  // World Actions
-  setSuspicion: (level) => set((state) => ({
-    world: { ...state.world, suspicion: Math.max(0, Math.min(100, level)) }
-  })),
+  /**
+   * Set global suspicion level, clamped to [0, 100].
+   * Logs analytics event when suspicion maxes out.
+   * @param {number} level - New suspicion level.
+   */
+  setSuspicion: (level) => set((state) => {
+    const clamped = Math.max(0, Math.min(MAX_SUSPICION, level));
+    if (clamped >= MAX_SUSPICION && state.world.suspicion < MAX_SUSPICION) {
+      logSuspicionMaxed();
+    }
+    return { world: { ...state.world, suspicion: clamped } };
+  }),
   
   initWorld: (guards, npcs) => set((state) => ({
     world: { ...state.world, guards, npcs }
   })),
 
-  // Interaction Actions
-  startDialogue: (npcId) => set((state) => ({
-    ui: { ...state.ui, dialogue: { isOpen: true, npcId, messages: [] } }
-  })),
+  /**
+   * Open the dialogue UI and log the NPC interaction.
+   * @param {string} npcId - NPC identifier.
+   * @param {string} npcName - NPC display name.
+   * @param {string} npcRole - NPC's role.
+   */
+  startDialogue: (npcId, npcName = 'Unknown', npcRole = 'Unknown') => {
+    logNPCInteraction(npcId, npcRole);
+    set((state) => ({
+      ui: { ...state.ui, dialogue: { isOpen: true, npcId, npcName, npcRole, messages: [] } }
+    }));
+  },
 
   closeDialogue: () => set((state) => ({
     ui: { ...state.ui, dialogue: { ...state.ui.dialogue, isOpen: false, npcId: null } }
@@ -82,14 +154,25 @@ export const useGameStore = create((set, get) => ({
     }
   })),
 
-  // Mission Actions
-  setActiveMission: (mission) => set((state) => ({
-    missions: { ...state.missions, active: mission }
-  })),
+  /**
+   * Set the active mission and log the event.
+   * @param {Object} mission - Mission object to activate.
+   */
+  setActiveMission: (mission) => {
+    logMissionStarted(mission.id, mission.title);
+    set((state) => ({
+      missions: { ...state.missions, active: mission }
+    }));
+  },
 
+  /**
+   * Complete the current active mission, moving it to the completed list.
+   * Logs the completion event.
+   */
   completeMission: () => set((state) => {
     const active = state.missions.active;
     if (!active) return state;
+    logMissionCompleted(active.id);
     return {
       missions: {
         active: null,

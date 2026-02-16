@@ -4,13 +4,11 @@ import { useGameStore } from '../state/store';
 import { useInput } from '../utils/useInput';
 
 const Player = () => {
-    const { x, y, speed } = useGameStore((state) => state.player);
+    const { x, y, speed, direction } = useGameStore((state) => state.player);
     const movePlayer = useGameStore((state) => state.movePlayer);
     const keys = useInput();
 
-    // Game Loop for Player Movement
     useTick((ticker) => {
-        // ticker.deltaTime is usually ~1.0 at 60fps
         const delta = ticker.deltaTime;
         let dx = 0;
         let dy = 0;
@@ -22,7 +20,6 @@ const Player = () => {
         if (keys['ArrowRight'] || keys['KeyD']) dx += moveSpeed;
 
         if (dx !== 0 || dy !== 0) {
-            // Normalize diagonal movement
             if (dx !== 0 && dy !== 0) {
                 const factor = 1 / Math.sqrt(2);
                 dx *= factor;
@@ -36,17 +33,56 @@ const Player = () => {
         <graphics
             draw={(g) => {
                 g.clear();
-                // Player body
-                g.rect(-16, -16, 32, 32);
-                g.fill(0x00ff00);
 
-                // Direction indicator
-                g.moveTo(0, 0);
-                g.lineTo(16, 0);
-                g.stroke({ width: 2, color: 0xffffff });
+                // === TOP-DOWN PLAYER CHARACTER ===
+
+                // Shadow
+                g.ellipse(0, 2, 14, 8);
+                g.fill({ color: 0x000000, alpha: 0.3 });
+
+                // Body (torso)
+                g.roundRect(-10, -8, 20, 22, 4);
+                g.fill(0x1a1a2e);
+                // Body highlight
+                g.roundRect(-8, -6, 16, 18, 3);
+                g.fill(0x252545);
+
+                // Shoulders
+                g.roundRect(-12, -6, 6, 10, 3);
+                g.fill(0x1a1a2e);
+                g.roundRect(6, -6, 6, 10, 3);
+                g.fill(0x1a1a2e);
+
+                // Head
+                g.circle(0, -12, 8);
+                g.fill(0x0f3460);
+                // Head inner (face area)
+                g.circle(0, -12, 6);
+                g.fill(0xd4a574);
+                // Eye visor / mask
+                g.roundRect(-5, -14, 10, 4, 2);
+                g.fill({ color: 0x00ffaa, alpha: 0.8 });
+
+                // Direction indicator (pointing forward)
+                g.moveTo(0, -22);
+                g.lineTo(-4, -18);
+                g.lineTo(4, -18);
+                g.lineTo(0, -22);
+                g.fill({ color: 0x00ffaa, alpha: 0.6 });
+
+                // Belt
+                g.rect(-9, 4, 18, 3);
+                g.fill(0x333355);
+
+                // Legs
+                g.roundRect(-8, 14, 6, 8, 2);
+                g.fill(0x151528);
+                g.roundRect(2, 14, 6, 8, 2);
+                g.fill(0x151528);
             }}
             x={x}
             y={y}
+            rotation={direction}
         />
     );
 };

@@ -1,15 +1,27 @@
-import React from 'react';
+/**
+ * Root application component.
+ * Sets up game container with ARIA attributes for accessibility.
+ * @module App
+ */
+
+import React, { Suspense, lazy } from 'react';
+import './App.css';
 import GameCanvas from './components/GameCanvas';
 import HUD from './components/UI/HUD';
-import { useGameStore } from './state/store';
+import GameAnnouncer from './components/UI/GameAnnouncer';
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#222', position: 'relative' }}>
+    <div
+      className="game-container"
+      role="application"
+      aria-label="Echoes of the Hidden game world"
+    >
       <GameCanvas />
       <HUD />
-      <div style={{ color: '#aaa', marginTop: '10px', fontSize: '0.8rem', position: 'absolute', bottom: '10px' }}>
-        WASD to Move | E to Interact
+      <GameAnnouncer />
+      <div className="controls-hint" aria-hidden="true">
+        WASD — Move &nbsp;&nbsp;|&nbsp;&nbsp; E — Interact
       </div>
     </div>
   );

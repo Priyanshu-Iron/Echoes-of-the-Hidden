@@ -1,45 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Application } from '@pixi/react';
 import { useGameStore } from '../state/store';
 import Player from '../game/Player';
 import Guard from '../game/Guard';
 import NPC from '../game/NPC';
+import TileMap from '../game/TileMap';
 import DialogueBox from './UI/DialogueBox';
 import { getDistance } from '../utils/geometry';
 import { useInput } from '../utils/useInput';
+import { GUARD_SPAWNS, NPC_SPAWNS, MAP_WIDTH, MAP_HEIGHT } from '../game/mapData';
 
 const GameCanvas = () => {
-    // Canvas size
-    const width = 800;
-    const height = 600;
+    const [size, setSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight
+    });
 
-    // Use store state
     const playerPos = useGameStore((state) => state.player);
     const { dialogue } = useGameStore((state) => state.ui);
     const startDialogue = useGameStore((state) => state.startDialogue);
 
-    // Initial data
-    const guards = [
-        { id: 1, x: 300, y: 300, path: [{ x: 300, y: 300 }, { x: 500, y: 300 }, { x: 500, y: 500 }, { x: 300, y: 500 }] },
-        { id: 2, x: 600, y: 100, path: [{ x: 600, y: 100 }, { x: 700, y: 100 }, { x: 600, y: 100 }] }
-    ];
-
-    const npcs = [
-        { id: 'npc_1', x: 400, y: 100, role: 'Informant' },
-        { id: 'npc_2', x: 100, y: 500, role: 'Civilian' }
-    ];
-
     const keys = useInput();
 
-    // Interaction Check Loop
+    // Responsive resize
+    useEffect(() => {
+        const handleResize = () => {
+            setSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Interaction check
     useEffect(() => {
         const checkInteraction = () => {
             if (keys['KeyE'] && !dialogue.isOpen) {
                 const interactionRange = 50;
-                const target = npcs.find(npc => getDistance(playerPos, npc) < interactionRange);
+                const target = NPC_SPAWNS.find(npc => getDistance(playerPos, npc) < interactionRange);
 
                 if (target) {
-                    startDialogue(target.id);
+                    startDialogue(target.id, target.name, target.role);
                 }
             }
         };
@@ -48,11 +48,42 @@ const GameCanvas = () => {
         return () => clearInterval(interval);
     }, [keys, playerPos, dialogue.isOpen, startDialogue]);
 
+    // Camera: center on player, clamped to map bounds
+    const cameraX = Math.max(
+        -(MAP_WIDTH - size.width),
+        Math.min(0, -playerPos.x + size.width / 2)
+    );
+    const cameraY = Math.max(
+        -(MAP_HEIGHT - size.height),
+        Math.min(0, -playerPos.y + size.height / 2)
+    );
+
     return (
-        <div style={{ position: 'relative' }}>
-            <Application width={width} height={height} background={0x1099bb}>
-                <container>
-                    {guards.map(g => (
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Application
+                width={size.width}
+                height={size.height}
+                background={0x08080f}
+                antialias={true}
+            >
+                <container x={cameraX} y={cameraY}>
+                    {/* Background map layer */}
+                    <TileMap />
+
+                    {/* NPCs (render below player) */}
+                    {NPC_SPAWNS.map(npc => (
+                        <NPC
+                            key={npc.id}
+                            id={npc.id}
+                            x={npc.x}
+                            y={npc.y}
+                            role={npc.role}
+                            name={npc.name}
+                        />
+                    ))}
+
+                    {/* Guards */}
+                    {GUARD_SPAWNS.map(g => (
                         <Guard
                             key={g.id}
                             id={g.id}
@@ -61,15 +92,8 @@ const GameCanvas = () => {
                             patrolPath={g.path}
                         />
                     ))}
-                    {npcs.map(npc => (
-                        <NPC
-                            key={npc.id}
-                            id={npc.id}
-                            x={npc.x}
-                            y={npc.y}
-                            role={npc.role}
-                        />
-                    ))}
+
+                    {/* Player (top layer) */}
                     <Player />
                 </container>
             </Application>
