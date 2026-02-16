@@ -44,6 +44,7 @@ export const useGameStore = create((set, get) => ({
       npcId: null,
       npcName: '',
       npcRole: '',
+      voice: null,
       messages: [],
     }
   },
@@ -135,6 +136,7 @@ export const useGameStore = create((set, get) => ({
         personality: extra.personality || '',
         backstory: extra.backstory || '',
         missions: extra.missions || [],
+        voice: extra.voice || { pitch: 1.0, rate: 1.0 }, // Default voice
         messages: [],
       } }
     }));

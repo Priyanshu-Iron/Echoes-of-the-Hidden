@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTick } from '@pixi/react';
 import { useGameStore } from '../state/store';
 import { getDistance, getAngle, isPointInCone } from '../utils/geometry';
+import { soundManager } from '../utils/sound';
 
 const FOV = Math.PI / 3;
 const VIEW_RANGE = 200;
@@ -14,25 +15,35 @@ const Guard = ({ id, initialX, initialY, patrolPath }) => {
 
     const player = useGameStore((state) => state.player);
     const setSuspicion = useGameStore((state) => state.setSuspicion);
-    const suspicion = useGameStore((state) => state.world.suspicion);
 
     useTick((ticker) => {
         const delta = ticker.deltaTime;
+
+        // Read latest suspicion from store to avoid stale closure
+        const currentSuspicion = useGameStore.getState().world.suspicion;
 
         const dist = getDistance(pos, player);
         const seen = isPointInCone(pos, player, rotation, FOV, VIEW_RANGE);
 
         if (seen) {
-            if (suspicion < 100) {
-                setSuspicion(suspicion + 1 * delta);
+            if (currentSuspicion < 100) {
+                setSuspicion(currentSuspicion + 1 * delta);
             }
-            if (state !== 'CHASE') setState('CHASE');
+            // Reputation penalty when suspicion maxes out
+            if (currentSuspicion >= 100) {
+                useGameStore.getState().updateReputation(-5 * delta);
+            }
+            if (state !== 'CHASE') {
+                setState('CHASE');
+                soundManager.playGuardChase(); // Siren
+            }
         } else {
-            if (suspicion > 0 && state !== 'CHASE') {
-                setSuspicion(Math.max(0, suspicion - 0.1 * delta));
+            if (currentSuspicion > 0 && state !== 'CHASE') {
+                setSuspicion(Math.max(0, currentSuspicion - 0.1 * delta));
             }
             if (state === 'CHASE' && !seen) {
                 setState('ALERT');
+                soundManager.playGuardAlert(); // "Huh?"
             }
         }
 

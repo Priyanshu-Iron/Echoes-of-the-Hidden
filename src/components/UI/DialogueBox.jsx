@@ -9,12 +9,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../../state/store';
 import { chatWithNPC } from '../../services/ai';
 import { MAX_DIALOGUE_INPUT_LENGTH } from '../../game/constants';
+import { soundManager } from '../../utils/sound';
 
 const DialogueBox = () => {
-    const { isOpen, npcId, npcName, npcRole, personality, backstory, missions, messages } = useGameStore((state) => state.ui.dialogue);
+    const { isOpen, npcId, npcName, npcRole, personality, backstory, missions, voice, messages } = useGameStore((state) => state.ui.dialogue);
     const closeDialogue = useGameStore((state) => state.closeDialogue);
     const addMessage = useGameStore((state) => state.addMessage);
     const setActiveMission = useGameStore((state) => state.setActiveMission);
+    const updateReputation = useGameStore((state) => state.updateReputation);
 
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -70,6 +72,15 @@ const DialogueBox = () => {
                 missions,
             }, trimmed, messages);
             addMessage('npc', response.text);
+
+            // Trigger NPC voice
+            if (voice) {
+                soundManager.speak(response.text, voice);
+            }
+
+            if (response.reputationChange) {
+                updateReputation(response.reputationChange);
+            }
             if (response.mission) {
                 setActiveMission(response.mission);
                 addMessage('system', `New Mission: ${response.mission.title}`);

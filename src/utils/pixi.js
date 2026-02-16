@@ -1,3 +1,4 @@
+import 'pixi.js/unsafe-eval';
 import { extend } from '@pixi/react';
 import { Container, Graphics, Sprite } from 'pixi.js';
 

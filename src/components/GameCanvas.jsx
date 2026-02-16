@@ -9,6 +9,7 @@ import DialogueBox from './UI/DialogueBox';
 import { getDistance } from '../utils/geometry';
 import { useInput } from '../utils/useInput';
 import { GUARD_SPAWNS, NPC_SPAWNS, MAP_WIDTH, MAP_HEIGHT } from '../game/mapData';
+import { soundManager } from '../utils/sound';
 
 const GameCanvas = () => {
     const [size, setSize] = useState({
@@ -43,6 +44,7 @@ const GameCanvas = () => {
                         personality: target.personality,
                         backstory: target.backstory,
                         missions: target.missions,
+                        voice: target.voice,
                     });
                 }
             }
@@ -63,7 +65,13 @@ const GameCanvas = () => {
     );
 
     return (
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div
+            style={{ position: 'relative', width: '100%', height: '100%' }}
+            onClick={() => {
+                soundManager.init();
+                // soundManager.playBackgroundMusic(); // Optional: start music on click
+            }}
+        >
             <Application
                 width={size.width}
                 height={size.height}

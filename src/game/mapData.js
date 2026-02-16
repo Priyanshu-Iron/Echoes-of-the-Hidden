@@ -275,6 +275,7 @@ export const NPC_SPAWNS = [
     role: 'Informant', name: 'Shadow Broker',
     personality: 'Paranoid, cryptic, speaks in riddles. Trusts no one but respects bold agents.',
     backstory: 'Former intelligence analyst who went rogue after discovering corruption. Now trades secrets from the shadows.',
+    voice: { pitch: 0.5, rate: 0.8 }, // Deep, slow, mysterious
     missions: [
       { id: 'shadow_intel', title: 'Stolen Intelligence', description: 'Recover the classified dossier from the Server Room before it gets wiped.' },
       { id: 'shadow_wiretap', title: 'Wiretap the Captain', description: 'Plant a listening device near the Guard Captain in the Armory.' },
@@ -285,6 +286,7 @@ export const NPC_SPAWNS = [
     role: 'Civilian', name: 'Kitchen Worker',
     personality: 'Friendly but nervous. Gossips a lot. Knows secrets from overhearing guard conversations.',
     backstory: 'Works in the mess hall. Overhears guard rotations and supply schedules. Desperate for someone to help her brother escape.',
+    voice: { pitch: 1.2, rate: 1.1 }, // Slightly high, nervous/fast
     missions: [
       { id: 'kitchen_distraction', title: 'Create a Distraction', description: 'Set off the fire alarm in the Mess Hall so the guards leave their posts.' },
       { id: 'kitchen_rescue', title: 'Find My Brother', description: 'My brother is held somewhere in the Command Center. Please find any sign of him.' },
@@ -295,6 +297,7 @@ export const NPC_SPAWNS = [
     role: 'Hacker', name: 'Ghost',
     personality: 'Sarcastic tech genius. Speaks in tech jargon. Loves showing off skills but is genuinely helpful.',
     backstory: 'Elite hacker implanted inside the compound. Can access security systems and disable cameras, but needs physical access to terminals.',
+    voice: { pitch: 1.5, rate: 1.2 }, // High, fast, "techy"
     missions: [
       { id: 'hack_cameras', title: 'Disable Surveillance', description: 'Reach the Security Office and plug in my USB drive to disable all cameras for 5 minutes.' },
       { id: 'hack_download', title: 'Data Extraction', description: 'Access the Server Room terminal and download the encrypted files to this drive.' },
@@ -305,6 +308,7 @@ export const NPC_SPAWNS = [
     role: 'Guard Captain', name: 'Ironjaw',
     personality: 'Stern, authoritative, but secretly conflicted about orders. Respects strength and directness.',
     backstory: 'Veteran guard captain who suspects the compound leadership is corrupt. Might help if you earn his respect, but will attack if provoked.',
+    voice: { pitch: 0.1, rate: 0.9 }, // Very deep, commanding
     missions: [
       { id: 'captain_proof', title: 'Evidence of Corruption', description: 'Bring me proof of the Commander\'s illegal orders from the Command Center.' },
       { id: 'captain_defect', title: 'Convince the Ranks', description: 'Talk to 3 guards and show them the evidence. I\'ll handle the rest.' },
@@ -315,6 +319,7 @@ export const NPC_SPAWNS = [
     role: 'Doctor', name: 'Dr. Voss',
     personality: 'Quiet, empathetic, morally conflicted. Heals anyone who asks but knows too much about experiments.',
     backstory: 'The compound\'s medic. Has been forced to perform unethical experiments on prisoners. Wants to expose the truth but fears retaliation.',
+    voice: { pitch: 1.0, rate: 0.9 }, // Normal, calm, slightly slow
     missions: [
       { id: 'doctor_samples', title: 'Destroy the Samples', description: 'There are biological samples in the restricted Server Room. Destroy them before they\'re shipped out.' },
       { id: 'doctor_records', title: 'Medical Records', description: 'Steal the experiment logs from the Command Center. The world needs to know.' },
@@ -325,6 +330,7 @@ export const NPC_SPAWNS = [
     role: 'Arms Dealer', name: 'Viper',
     personality: 'Charming, untrustworthy, always angling for profit. Speaks in deals and negotiations.',
     backstory: 'Black market dealer who smuggles weapons through the Armory. Has connections everywhere and will sell anything — for the right price.',
+    voice: { pitch: 0.8, rate: 1.3 }, // Slightly deep but fast talker
     missions: [
       { id: 'dealer_supply', title: 'Smuggle the Package', description: 'Pick up a package from the Storage room and bring it to me. No questions asked.' },
       { id: 'dealer_sabotage', title: 'Sabotage the Armory', description: 'Tamper with the weapon crates in the Armory to make them malfunction.' },
