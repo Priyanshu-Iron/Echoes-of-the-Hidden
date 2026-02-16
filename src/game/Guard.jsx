@@ -29,10 +29,13 @@ const Guard = ({ id, initialX, initialY, patrolPath }) => {
             if (currentSuspicion < 100) {
                 setSuspicion(currentSuspicion + 1 * delta);
             }
-            // Reputation penalty when suspicion maxes out
-            if (currentSuspicion >= 100) {
-                useGameStore.getState().updateReputation(-5 * delta);
+            // Reputation penalty when suspicion maxes out (handled in store now via setGameOver)
+
+            // CAUGHT CONDITION: If very close and seen AND suspicion is high (>= 70%)
+            if (dist < 30 && currentSuspicion >= 70) {
+                useGameStore.getState().setGameOver(true);
             }
+
             if (state !== 'CHASE') {
                 setState('CHASE');
                 soundManager.playGuardChase(); // Siren

@@ -1,9 +1,9 @@
 // Map Configuration
 export const TILE_SIZE = 40;
-export const MAP_COLS = 60;
+export const MAP_COLS = 90; // Extended for City
 export const MAP_ROWS = 45;
-export const MAP_WIDTH = MAP_COLS * TILE_SIZE;  // 2400
-export const MAP_HEIGHT = MAP_ROWS * TILE_SIZE; // 1800
+export const MAP_WIDTH = MAP_COLS * TILE_SIZE;
+export const MAP_HEIGHT = MAP_ROWS * TILE_SIZE;
 
 // Tile Types
 export const TILE = {
@@ -13,6 +13,8 @@ export const TILE = {
   EXIT: 3,
   FLOOR_ALT: 4,   // Slightly different shade for visual variety
   DOOR: 5,
+  STREET: 6,      // New: City street
+  BUILDING: 7,    // New: City building
 };
 
 // Color palette for tiles — clean light theme
@@ -23,6 +25,8 @@ export const TILE_COLORS = {
   [TILE.RESTRICTED]: 0xfce4e4,
   [TILE.EXIT]:       0xd4f5d4,
   [TILE.DOOR]:       0xe0dcc8,
+  [TILE.STREET]:     0xd0d0d8, // Darker gray for asphalt/street
+  [TILE.BUILDING]:   0xa0a0b0, // Darker for city buildings
 };
 
 export const WALL_TOP_COLOR = 0xd8d8e4;
@@ -32,7 +36,9 @@ export const WALL_SHADOW_COLOR = 0xb0b0c0;
 const fillRect = (map, x, y, w, h, tile) => {
   for (let row = y; row < y + h && row < MAP_ROWS; row++) {
     for (let col = x; col < x + w && col < MAP_COLS; col++) {
-      map[row][col] = tile;
+        if (row >= 0 && row < MAP_ROWS && col >= 0 && col < MAP_COLS) {
+            map[row][col] = tile;
+        }
     }
   }
 };
@@ -158,12 +164,46 @@ const generateMap = () => {
   fillRect(map, 2, 32, 56, 2, TILE.FLOOR_ALT);
 
   // === EXIT POINT ===
-  fillRect(map, 28, 0, 4, 3, TILE.EXIT);
+  // Connects to the City!
+  fillRect(map, 58, 20, 4, 6, TILE.DOOR); // Large gate to city
+
+  // === CITY EXTENSION (Right side) ===
+  const cityStartCol = 62;
+  
+  // Main City Street
+  fillRect(map, cityStartCol, 0, 8, 45, TILE.STREET); // Vertical street
+  
+  // Cross streets
+  fillRect(map, cityStartCol, 10, 28, 6, TILE.STREET);
+  fillRect(map, cityStartCol, 30, 28, 6, TILE.STREET);
+
+  // City Buildings (Blocks)
+  // Top Block
+  fillRect(map, 72, 2, 16, 6, TILE.BUILDING);
+  
+  // Middle Block
+  fillRect(map, 72, 18, 16, 10, TILE.BUILDING);
+  
+  // Bottom Block
+  fillRect(map, 72, 38, 16, 5, TILE.BUILDING);
 
   return map;
 };
 
 export const MAP_DATA = generateMap();
+
+export const MAP_LABELS = [
+  { text: "Security", x: 9 * TILE_SIZE, y: 8 * TILE_SIZE },
+  { text: "Server Room", x: 49 * TILE_SIZE, y: 8 * TILE_SIZE },
+  { text: "Barracks", x: 10 * TILE_SIZE, y: 22 * TILE_SIZE },
+  { text: "Armory", x: 50 * TILE_SIZE, y: 21 * TILE_SIZE },
+  { text: "Courtyard", x: 30 * TILE_SIZE, y: 24 * TILE_SIZE },
+  { text: "Mess Hall", x: 11 * TILE_SIZE, y: 36 * TILE_SIZE },
+  { text: "Storage", x: 29 * TILE_SIZE, y: 38 * TILE_SIZE },
+  { text: "Command Center", x: 49 * TILE_SIZE, y: 36 * TILE_SIZE },
+  { text: "CITY - SECTOR 7", x: 74 * TILE_SIZE, y: 13 * TILE_SIZE, color: '#ffffff' },
+  { text: "MARKET ROW", x: 74 * TILE_SIZE, y: 33 * TILE_SIZE, color: '#ffffff' },
+];
 
 // Check if a position (in pixels) is walkable
 export const isWalkable = (pixelX, pixelY) => {
@@ -173,7 +213,7 @@ export const isWalkable = (pixelX, pixelY) => {
   if (row < 0 || row >= MAP_ROWS || col < 0 || col >= MAP_COLS) return false;
   
   const tile = MAP_DATA[row][col];
-  return tile !== TILE.WALL;
+  return tile !== TILE.WALL && tile !== TILE.BUILDING;
 };
 
 // Check if a bounding box can move to a position

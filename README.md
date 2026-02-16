@@ -44,6 +44,7 @@ Every NPC is driven by a **large language model** (Gemini 2.0 Flash). They have 
 The game takes place in a **60×45 tile** military compound (2400×1800 px). Rooms are connected by corridors, and the only exit is at the **north gate**.
 
 ```
+           TOP-SECRET MILITARY COMPOUND — SECTOR-7
 ┌──────────────────────────────────────────────────────────────┐
 │                         ▓▓▓▓ EXIT ▓▓▓▓                      │
 │                                                              │

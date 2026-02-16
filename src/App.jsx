@@ -9,6 +9,7 @@ import './App.css';
 import GameCanvas from './components/GameCanvas';
 import HUD from './components/UI/HUD';
 import GameAnnouncer from './components/UI/GameAnnouncer';
+import GameOverScreen from './components/UI/GameOverScreen';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <GameCanvas />
       <HUD />
       <GameAnnouncer />
+      <GameOverScreen />
       <div className="controls-hint" aria-hidden="true" style={{
         position: 'absolute',
         bottom: '16px',

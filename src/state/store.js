@@ -29,6 +29,7 @@ export const useGameStore = create((set, get) => ({
     suspicion: 0,
     guards: [],
     npcs: [],
+    gameOver: false, // New state
   },
 
   // --- MISSION STATE ---
@@ -111,11 +112,40 @@ export const useGameStore = create((set, get) => ({
    */
   setSuspicion: (level) => set((state) => {
     const clamped = Math.max(0, Math.min(MAX_SUSPICION, level));
+    
+    // Trigger Game Over if suspicion hits max
     if (clamped >= MAX_SUSPICION && state.world.suspicion < MAX_SUSPICION) {
       logSuspicionMaxed();
+      return { 
+          world: { ...state.world, suspicion: clamped, gameOver: true } 
+      };
     }
+    
     return { world: { ...state.world, suspicion: clamped } };
   }),
+
+  /** Set Game Over status directly */
+  setGameOver: (status) => set((state) => ({
+      world: { ...state.world, gameOver: status }
+  })),
+
+  /** Reset game state for retry */
+  resetGame: () => set((state) => ({
+      player: {
+          ...state.player,
+          x: PLAYER_SPAWN.x,
+          y: PLAYER_SPAWN.y,
+          reputation: DEFAULT_REPUTATION,
+          inventory: [],
+      },
+      world: {
+          ...state.world,
+          suspicion: 0,
+          gameOver: false,
+      },
+      // Keep completed missions? Or reset? Usually reset for full restart
+      missions: { active: null, completed: [] },
+  })),
   
   initWorld: (guards, npcs) => set((state) => ({
     world: { ...state.world, guards, npcs }

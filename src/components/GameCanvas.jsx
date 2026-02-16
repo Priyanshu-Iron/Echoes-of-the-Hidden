@@ -11,6 +11,8 @@ import { useInput } from '../utils/useInput';
 import { GUARD_SPAWNS, NPC_SPAWNS, MAP_WIDTH, MAP_HEIGHT } from '../game/mapData';
 import { soundManager } from '../utils/sound';
 
+import MapLabels from '../game/MapLabels';
+
 const GameCanvas = () => {
     const [size, setSize] = useState({
         width: window.innerWidth,
@@ -81,6 +83,7 @@ const GameCanvas = () => {
                 <container x={cameraX} y={cameraY}>
                     {/* Background map layer */}
                     <TileMap />
+                    <MapLabels />
 
                     {/* NPCs (render below player) */}
                     {NPC_SPAWNS.map(npc => (
