@@ -31,13 +31,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     // Enable source maps for debugging
     sourcemap: false,
-    // Minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-      },
-    },
+    // Minification (esbuild is built into Vite)
+    minify: 'esbuild',
+  },
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
 })

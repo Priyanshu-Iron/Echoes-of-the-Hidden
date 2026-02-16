@@ -1,8 +1,6 @@
 /**
  * DialogueBox — Chat interface for NPC interactions.
- * Accessible dialog with focus trapping, ARIA attributes,
- * input sanitization, and glassmorphism styling.
- * 
+ * Frosted white theme with dark text, focus trapping, and ARIA attributes.
  * @module components/UI/DialogueBox
  */
 
@@ -13,7 +11,7 @@ import { chatWithNPC } from '../../services/ai';
 import { MAX_DIALOGUE_INPUT_LENGTH } from '../../game/constants';
 
 const DialogueBox = () => {
-    const { isOpen, npcId, npcName, npcRole, messages } = useGameStore((state) => state.ui.dialogue);
+    const { isOpen, npcId, npcName, npcRole, personality, backstory, missions, messages } = useGameStore((state) => state.ui.dialogue);
     const closeDialogue = useGameStore((state) => state.closeDialogue);
     const addMessage = useGameStore((state) => state.addMessage);
     const setActiveMission = useGameStore((state) => state.setActiveMission);
@@ -28,36 +26,21 @@ const DialogueBox = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+    useEffect(() => { scrollToBottom(); }, [messages]);
 
-    // Focus trap and ESC handler
     useEffect(() => {
-        if (isOpen) {
-            inputRef.current?.focus();
-        }
+        if (isOpen) inputRef.current?.focus();
     }, [isOpen]);
 
     const handleKeyDown = useCallback((e) => {
-        if (e.key === 'Escape') {
-            closeDialogue();
-        }
-        // Trap tab within dialog
+        if (e.key === 'Escape') closeDialogue();
         if (e.key === 'Tab' && dialogRef.current) {
-            const focusable = dialogRef.current.querySelectorAll(
-                'button, input, [tabindex]:not([tabindex="-1"])'
-            );
+            const focusable = dialogRef.current.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
             if (focusable.length === 0) return;
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
     }, [closeDialogue]);
 
@@ -68,9 +51,6 @@ const DialogueBox = () => {
         }
     }, [isOpen, handleKeyDown]);
 
-    /**
-     * Sanitize input and send to AI service.
-     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         const trimmed = input.trim().slice(0, MAX_DIALOGUE_INPUT_LENGTH);
@@ -81,9 +61,15 @@ const DialogueBox = () => {
         setIsTyping(true);
 
         try {
-            const response = await chatWithNPC({ npcId, role: npcRole, name: npcName }, trimmed);
+            const response = await chatWithNPC({
+                npcId,
+                role: npcRole,
+                name: npcName,
+                personality,
+                backstory,
+                missions,
+            }, trimmed, messages);
             addMessage('npc', response.text);
-
             if (response.mission) {
                 setActiveMission(response.mission);
                 addMessage('system', `New Mission: ${response.mission.title}`);
@@ -114,17 +100,17 @@ const DialogueBox = () => {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: 'min(600px, 90vw)',
-                    backgroundColor: 'rgba(8, 8, 16, 0.85)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(0, 0, 0, 0.1)',
                     borderRadius: '16px',
                     padding: '20px',
-                    color: '#fff',
+                    color: '#1e293b',
                     fontFamily: "'Inter', sans-serif",
                     zIndex: 100,
                     marginLeft: 'min(-300px, -45vw)',
-                    boxShadow: '0 8px 40px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 255, 170, 0.05)',
+                    boxShadow: '0 8px 40px rgba(0, 0, 0, 0.12), 0 0 80px rgba(6, 182, 212, 0.04)',
                 }}
             >
                 {/* Header */}
@@ -134,18 +120,14 @@ const DialogueBox = () => {
                     alignItems: 'center',
                     marginBottom: '14px',
                     paddingBottom: '10px',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
                 }}>
                     <div>
-                        <span style={{
-                            color: '#00ffaa',
-                            fontWeight: 600,
-                            fontSize: '0.95rem',
-                        }}>
+                        <span style={{ color: '#0891b2', fontWeight: 600, fontSize: '0.95rem' }}>
                             {npcName || 'Unknown'}
                         </span>
                         <span style={{
-                            color: 'rgba(255, 255, 255, 0.3)',
+                            color: 'rgba(30,41,59,0.4)',
                             fontSize: '0.7rem',
                             marginLeft: '10px',
                             letterSpacing: '1px',
@@ -158,9 +140,9 @@ const DialogueBox = () => {
                         onClick={closeDialogue}
                         aria-label="Close dialogue (Escape)"
                         style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: 'rgba(255, 255, 255, 0.4)',
+                            background: 'rgba(0, 0, 0, 0.05)',
+                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'rgba(30,41,59,0.5)',
                             cursor: 'pointer',
                             borderRadius: '8px',
                             padding: '4px 10px',
@@ -186,7 +168,7 @@ const DialogueBox = () => {
                 >
                     {messages.length === 0 && (
                         <div style={{
-                            color: 'rgba(255, 255, 255, 0.25)',
+                            color: 'rgba(30,41,59,0.3)',
                             fontStyle: 'italic',
                             fontSize: '0.85rem',
                             textAlign: 'center',
@@ -203,10 +185,10 @@ const DialogueBox = () => {
                             <div style={{
                                 display: 'inline-block',
                                 backgroundColor: msg.sender === 'player'
-                                    ? 'rgba(0, 100, 255, 0.15)'
+                                    ? 'rgba(37, 99, 235, 0.1)'
                                     : msg.sender === 'system'
-                                        ? 'rgba(255, 215, 0, 0.1)'
-                                        : 'rgba(255, 255, 255, 0.05)',
+                                        ? 'rgba(180, 83, 9, 0.08)'
+                                        : 'rgba(0, 0, 0, 0.04)',
                                 borderRadius: '12px',
                                 padding: '8px 14px',
                                 maxWidth: '80%',
@@ -215,16 +197,15 @@ const DialogueBox = () => {
                                     fontSize: '0.6rem',
                                     letterSpacing: '1px',
                                     textTransform: 'uppercase',
-                                    color: msg.sender === 'player' ? '#4488ff'
-                                        : msg.sender === 'system' ? '#ffd700'
-                                            : '#00ffaa',
+                                    color: msg.sender === 'player' ? '#2563eb'
+                                        : msg.sender === 'system' ? '#b45309'
+                                            : '#0891b2',
                                     display: 'block',
                                     marginBottom: '3px',
                                 }}>
                                     {msg.sender === 'player' ? 'YOU' : (msg.sender === 'system' ? 'SYSTEM' : npcName || 'NPC')}
                                 </span>
-                                {/* XSS Prevention: render as text only, never as HTML */}
-                                <span style={{ fontSize: '0.85rem', lineHeight: 1.5 }}>{msg.text}</span>
+                                <span style={{ fontSize: '0.85rem', lineHeight: 1.5, color: '#1e293b' }}>{msg.text}</span>
                             </div>
                         </div>
                     ))}
@@ -232,14 +213,11 @@ const DialogueBox = () => {
                         <div style={{ textAlign: 'left', marginBottom: '10px' }} aria-label={`${npcName} is typing`}>
                             <div style={{
                                 display: 'inline-block',
-                                backgroundColor: 'rgba(255,255,255,0.05)',
+                                backgroundColor: 'rgba(0,0,0,0.04)',
                                 borderRadius: '12px',
                                 padding: '8px 14px',
                             }}>
-                                <span style={{
-                                    fontSize: '0.85rem',
-                                    color: 'rgba(255,255,255,0.4)',
-                                }}>
+                                <span style={{ fontSize: '0.85rem', color: 'rgba(30,41,59,0.4)' }}>
                                     typing...
                                 </span>
                             </div>
@@ -260,9 +238,9 @@ const DialogueBox = () => {
                         aria-label="Type your message to the NPC"
                         style={{
                             flex: 1,
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            color: '#fff',
+                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            border: '1px solid rgba(0, 0, 0, 0.08)',
+                            color: '#1e293b',
                             padding: '10px 14px',
                             borderRadius: '10px',
                             fontSize: '0.85rem',
@@ -277,9 +255,9 @@ const DialogueBox = () => {
                         disabled={isTyping}
                         aria-label={isTyping ? 'Waiting for response' : 'Send message'}
                         style={{
-                            backgroundColor: isTyping ? 'rgba(255,255,255,0.02)' : 'rgba(0, 255, 170, 0.15)',
-                            color: isTyping ? 'rgba(255,255,255,0.3)' : '#00ffaa',
-                            border: '1px solid rgba(0, 255, 170, 0.2)',
+                            backgroundColor: isTyping ? 'rgba(0,0,0,0.03)' : 'rgba(8, 145, 178, 0.12)',
+                            color: isTyping ? 'rgba(30,41,59,0.3)' : '#0891b2',
+                            border: '1px solid rgba(8, 145, 178, 0.2)',
                             padding: '10px 20px',
                             borderRadius: '10px',
                             cursor: isTyping ? 'not-allowed' : 'pointer',

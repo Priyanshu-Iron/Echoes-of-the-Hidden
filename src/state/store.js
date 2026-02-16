@@ -125,11 +125,18 @@ export const useGameStore = create((set, get) => ({
    * @param {string} npcId - NPC identifier.
    * @param {string} npcName - NPC display name.
    * @param {string} npcRole - NPC's role.
+   * @param {Object} [extra] - Additional NPC context (personality, backstory, missions).
    */
-  startDialogue: (npcId, npcName = 'Unknown', npcRole = 'Unknown') => {
+  startDialogue: (npcId, npcName = 'Unknown', npcRole = 'Unknown', extra = {}) => {
     logNPCInteraction(npcId, npcRole);
     set((state) => ({
-      ui: { ...state.ui, dialogue: { isOpen: true, npcId, npcName, npcRole, messages: [] } }
+      ui: { ...state.ui, dialogue: {
+        isOpen: true, npcId, npcName, npcRole,
+        personality: extra.personality || '',
+        backstory: extra.backstory || '',
+        missions: extra.missions || [],
+        messages: [],
+      } }
     }));
   },
 

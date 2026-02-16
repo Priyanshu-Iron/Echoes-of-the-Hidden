@@ -1,24 +1,20 @@
 /* ============================================
-   Global Reset & Base Styles
+   Global Reset & Base Styles — Light Theme
    ============================================ */
 
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
+html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #0a0a0f;
+  background: #f5f5fa;
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: #e0e0e0;
+  color: #1e293b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -36,10 +32,10 @@ canvas {
   top: -100%;
   left: 0;
   z-index: 9999;
-  background: #0a0a0f;
-  color: #00ffaa;
+  background: #ffffff;
+  color: #0891b2;
   padding: 12px 24px;
-  border: 2px solid #00ffaa;
+  border: 2px solid #0891b2;
   border-radius: 0 0 8px 0;
   font-size: 0.9rem;
   font-family: 'JetBrains Mono', monospace;
@@ -56,19 +52,19 @@ canvas {
    ============================================ */
 
 *:focus-visible {
-  outline: 2px solid #00ffaa;
+  outline: 2px solid #0891b2;
   outline-offset: 2px;
 }
 
 button:focus-visible {
-  outline: 2px solid #00ffaa;
+  outline: 2px solid #0891b2;
   outline-offset: 2px;
-  box-shadow: 0 0 12px rgba(0, 255, 170, 0.3);
+  box-shadow: 0 0 12px rgba(8, 145, 178, 0.2);
 }
 
 input:focus-visible {
-  border-color: #00ffaa !important;
-  box-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+  border-color: #0891b2 !important;
+  box-shadow: 0 0 8px rgba(8, 145, 178, 0.15);
 }
 
 /* ============================================
@@ -76,7 +72,6 @@ input:focus-visible {
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -92,7 +87,6 @@ input:focus-visible {
    ============================================ */
 
 @media (prefers-contrast: high) {
-
   .skip-link,
   button,
   input {

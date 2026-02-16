@@ -39,7 +39,11 @@ const GameCanvas = () => {
                 const target = NPC_SPAWNS.find(npc => getDistance(playerPos, npc) < interactionRange);
 
                 if (target) {
-                    startDialogue(target.id, target.name, target.role);
+                    startDialogue(target.id, target.name, target.role, {
+                        personality: target.personality,
+                        backstory: target.backstory,
+                        missions: target.missions,
+                    });
                 }
             }
         };
@@ -63,7 +67,7 @@ const GameCanvas = () => {
             <Application
                 width={size.width}
                 height={size.height}
-                background={0x08080f}
+                background={0xf0f0f5}
                 antialias={true}
             >
                 <container x={cameraX} y={cameraY}>

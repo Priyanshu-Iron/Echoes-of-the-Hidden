@@ -15,18 +15,18 @@ export const TILE = {
   DOOR: 5,
 };
 
-// Color palette for tiles
+// Color palette for tiles — clean light theme
 export const TILE_COLORS = {
-  [TILE.FLOOR]:      0x1a1a2e,
-  [TILE.FLOOR_ALT]:  0x16162a,
-  [TILE.WALL]:       0x2d2d44,
-  [TILE.RESTRICTED]: 0x2e1a1a,
-  [TILE.EXIT]:       0x1a2e1a,
-  [TILE.DOOR]:       0x2a2a1a,
+  [TILE.FLOOR]:      0xf0f0f5,
+  [TILE.FLOOR_ALT]:  0xe8e8f0,
+  [TILE.WALL]:       0xc8c8d4,
+  [TILE.RESTRICTED]: 0xfce4e4,
+  [TILE.EXIT]:       0xd4f5d4,
+  [TILE.DOOR]:       0xe0dcc8,
 };
 
-export const WALL_TOP_COLOR = 0x3d3d5c;
-export const WALL_SHADOW_COLOR = 0x0d0d15;
+export const WALL_TOP_COLOR = 0xd8d8e4;
+export const WALL_SHADOW_COLOR = 0xb0b0c0;
 
 // Helper to create a filled rectangle in the map
 const fillRect = (map, x, y, w, h, tile) => {
@@ -188,6 +188,7 @@ export const canMoveTo = (x, y, halfWidth = 12, halfHeight = 12) => {
 
 // Guard/NPC spawn points (on walkable tiles)
 export const GUARD_SPAWNS = [
+  // Original 4 guards
   {
     id: 1,
     x: 10 * TILE_SIZE, y: 15 * TILE_SIZE,
@@ -226,13 +227,109 @@ export const GUARD_SPAWNS = [
       { x: 44 * TILE_SIZE, y: 40 * TILE_SIZE },
     ]
   },
+  // 4 NEW guards
+  {
+    id: 5,
+    x: 8 * TILE_SIZE, y: 5 * TILE_SIZE,
+    path: [
+      { x: 5 * TILE_SIZE, y: 5 * TILE_SIZE },
+      { x: 14 * TILE_SIZE, y: 5 * TILE_SIZE },
+      { x: 14 * TILE_SIZE, y: 11 * TILE_SIZE },
+      { x: 5 * TILE_SIZE, y: 11 * TILE_SIZE },
+    ]
+  },
+  {
+    id: 6,
+    x: 10 * TILE_SIZE, y: 36 * TILE_SIZE,
+    path: [
+      { x: 5 * TILE_SIZE, y: 34 * TILE_SIZE },
+      { x: 16 * TILE_SIZE, y: 34 * TILE_SIZE },
+      { x: 16 * TILE_SIZE, y: 40 * TILE_SIZE },
+      { x: 5 * TILE_SIZE, y: 40 * TILE_SIZE },
+    ]
+  },
+  {
+    id: 7,
+    x: 28 * TILE_SIZE, y: 5 * TILE_SIZE,
+    path: [
+      { x: 20 * TILE_SIZE, y: 5 * TILE_SIZE },
+      { x: 38 * TILE_SIZE, y: 5 * TILE_SIZE },
+    ]
+  },
+  {
+    id: 8,
+    x: 42 * TILE_SIZE, y: 34 * TILE_SIZE,
+    path: [
+      { x: 38 * TILE_SIZE, y: 34 * TILE_SIZE },
+      { x: 42 * TILE_SIZE, y: 34 * TILE_SIZE },
+      { x: 42 * TILE_SIZE, y: 40 * TILE_SIZE },
+      { x: 38 * TILE_SIZE, y: 40 * TILE_SIZE },
+    ]
+  },
 ];
 
+/** NPC Spawns with personality, backstory, and available missions for AI. */
 export const NPC_SPAWNS = [
-  { id: 'npc_informant', x: 8 * TILE_SIZE, y: 7 * TILE_SIZE, role: 'Informant', name: 'Shadow Broker' },
-  { id: 'npc_civilian', x: 8 * TILE_SIZE, y: 36 * TILE_SIZE, role: 'Civilian', name: 'Kitchen Worker' },
-  { id: 'npc_hacker', x: 26 * TILE_SIZE, y: 6 * TILE_SIZE, role: 'Hacker', name: 'Ghost' },
-  { id: 'npc_guard_captain', x: 48 * TILE_SIZE, y: 20 * TILE_SIZE, role: 'Guard Captain', name: 'Ironjaw' },
+  {
+    id: 'npc_informant', x: 8 * TILE_SIZE, y: 7 * TILE_SIZE,
+    role: 'Informant', name: 'Shadow Broker',
+    personality: 'Paranoid, cryptic, speaks in riddles. Trusts no one but respects bold agents.',
+    backstory: 'Former intelligence analyst who went rogue after discovering corruption. Now trades secrets from the shadows.',
+    missions: [
+      { id: 'shadow_intel', title: 'Stolen Intelligence', description: 'Recover the classified dossier from the Server Room before it gets wiped.' },
+      { id: 'shadow_wiretap', title: 'Wiretap the Captain', description: 'Plant a listening device near the Guard Captain in the Armory.' },
+    ],
+  },
+  {
+    id: 'npc_civilian', x: 8 * TILE_SIZE, y: 36 * TILE_SIZE,
+    role: 'Civilian', name: 'Kitchen Worker',
+    personality: 'Friendly but nervous. Gossips a lot. Knows secrets from overhearing guard conversations.',
+    backstory: 'Works in the mess hall. Overhears guard rotations and supply schedules. Desperate for someone to help her brother escape.',
+    missions: [
+      { id: 'kitchen_distraction', title: 'Create a Distraction', description: 'Set off the fire alarm in the Mess Hall so the guards leave their posts.' },
+      { id: 'kitchen_rescue', title: 'Find My Brother', description: 'My brother is held somewhere in the Command Center. Please find any sign of him.' },
+    ],
+  },
+  {
+    id: 'npc_hacker', x: 26 * TILE_SIZE, y: 6 * TILE_SIZE,
+    role: 'Hacker', name: 'Ghost',
+    personality: 'Sarcastic tech genius. Speaks in tech jargon. Loves showing off skills but is genuinely helpful.',
+    backstory: 'Elite hacker implanted inside the compound. Can access security systems and disable cameras, but needs physical access to terminals.',
+    missions: [
+      { id: 'hack_cameras', title: 'Disable Surveillance', description: 'Reach the Security Office and plug in my USB drive to disable all cameras for 5 minutes.' },
+      { id: 'hack_download', title: 'Data Extraction', description: 'Access the Server Room terminal and download the encrypted files to this drive.' },
+    ],
+  },
+  {
+    id: 'npc_guard_captain', x: 48 * TILE_SIZE, y: 20 * TILE_SIZE,
+    role: 'Guard Captain', name: 'Ironjaw',
+    personality: 'Stern, authoritative, but secretly conflicted about orders. Respects strength and directness.',
+    backstory: 'Veteran guard captain who suspects the compound leadership is corrupt. Might help if you earn his respect, but will attack if provoked.',
+    missions: [
+      { id: 'captain_proof', title: 'Evidence of Corruption', description: 'Bring me proof of the Commander\'s illegal orders from the Command Center.' },
+      { id: 'captain_defect', title: 'Convince the Ranks', description: 'Talk to 3 guards and show them the evidence. I\'ll handle the rest.' },
+    ],
+  },
+  {
+    id: 'npc_doctor', x: 10 * TILE_SIZE, y: 22 * TILE_SIZE,
+    role: 'Doctor', name: 'Dr. Voss',
+    personality: 'Quiet, empathetic, morally conflicted. Heals anyone who asks but knows too much about experiments.',
+    backstory: 'The compound\'s medic. Has been forced to perform unethical experiments on prisoners. Wants to expose the truth but fears retaliation.',
+    missions: [
+      { id: 'doctor_samples', title: 'Destroy the Samples', description: 'There are biological samples in the restricted Server Room. Destroy them before they\'re shipped out.' },
+      { id: 'doctor_records', title: 'Medical Records', description: 'Steal the experiment logs from the Command Center. The world needs to know.' },
+    ],
+  },
+  {
+    id: 'npc_dealer', x: 48 * TILE_SIZE, y: 22 * TILE_SIZE,
+    role: 'Arms Dealer', name: 'Viper',
+    personality: 'Charming, untrustworthy, always angling for profit. Speaks in deals and negotiations.',
+    backstory: 'Black market dealer who smuggles weapons through the Armory. Has connections everywhere and will sell anything — for the right price.',
+    missions: [
+      { id: 'dealer_supply', title: 'Smuggle the Package', description: 'Pick up a package from the Storage room and bring it to me. No questions asked.' },
+      { id: 'dealer_sabotage', title: 'Sabotage the Armory', description: 'Tamper with the weapon crates in the Armory to make them malfunction.' },
+    ],
+  },
 ];
 
 // Player spawn

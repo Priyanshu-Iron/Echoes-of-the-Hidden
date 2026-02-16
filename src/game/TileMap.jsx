@@ -5,7 +5,6 @@ import {
 } from './mapData';
 
 const TileMap = () => {
-    // Pre-compute the draw function — only redraws if map changes (it won't)
     const drawMap = useMemo(() => {
         return (g) => {
             g.clear();
@@ -30,40 +29,43 @@ const TileMap = () => {
                         g.rect(x, y + TILE_SIZE * 0.6, TILE_SIZE, TILE_SIZE * 0.4);
                         g.fill(WALL_SHADOW_COLOR);
 
-                        // Subtle edge highlight
+                        // Subtle edge highlight (top edge)
                         g.rect(x, y, TILE_SIZE, 2);
-                        g.fill({ color: 0x5555aa, alpha: 0.3 });
+                        g.fill({ color: 0xffffff, alpha: 0.4 });
+
+                        // Bottom edge shadow
+                        g.rect(x, y + TILE_SIZE - 1, TILE_SIZE, 1);
+                        g.fill({ color: 0x888899, alpha: 0.3 });
                     }
 
                     if (tile === TILE.RESTRICTED) {
-                        // Red warning stripes
+                        // Red warning stripes on light pink
                         g.rect(x, y, TILE_SIZE, 2);
-                        g.fill({ color: 0xff3333, alpha: 0.15 });
+                        g.fill({ color: 0xdd4444, alpha: 0.2 });
                         g.rect(x, y + TILE_SIZE - 2, TILE_SIZE, 2);
-                        g.fill({ color: 0xff3333, alpha: 0.15 });
+                        g.fill({ color: 0xdd4444, alpha: 0.2 });
                     }
 
                     if (tile === TILE.EXIT) {
                         // Green glow border
                         g.rect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
-                        g.fill({ color: 0x00ff66, alpha: 0.15 });
-
+                        g.fill({ color: 0x22cc44, alpha: 0.12 });
                         g.rect(x, y, TILE_SIZE, 2);
-                        g.fill({ color: 0x00ff66, alpha: 0.4 });
+                        g.fill({ color: 0x22cc44, alpha: 0.35 });
                     }
 
                     if (tile === TILE.DOOR) {
-                        // Slightly brighter than floor, with a gap indicator
+                        // Slightly warmer than floor, with a gap indicator
                         g.rect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                        g.fill({ color: 0x3a3a2a, alpha: 0.6 });
+                        g.fill({ color: 0xc8c090, alpha: 0.4 });
                     }
 
-                    // Grid lines (very subtle)
+                    // Grid lines (subtle gray on white)
                     if (tile !== TILE.WALL) {
                         g.rect(x, y, TILE_SIZE, 1);
-                        g.fill({ color: 0xffffff, alpha: 0.02 });
+                        g.fill({ color: 0x000000, alpha: 0.04 });
                         g.rect(x, y, 1, TILE_SIZE);
-                        g.fill({ color: 0xffffff, alpha: 0.02 });
+                        g.fill({ color: 0x000000, alpha: 0.04 });
                     }
                 }
             }

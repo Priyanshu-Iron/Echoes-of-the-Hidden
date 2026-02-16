@@ -20,7 +20,17 @@ function App() {
       <GameCanvas />
       <HUD />
       <GameAnnouncer />
-      <div className="controls-hint" aria-hidden="true">
+      <div className="controls-hint" aria-hidden="true" style={{
+        position: 'absolute',
+        bottom: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        color: 'rgba(30, 41, 59, 0.4)',
+        fontSize: '0.75rem',
+        letterSpacing: '2px',
+        fontFamily: "'JetBrains Mono', monospace",
+        pointerEvents: 'none',
+      }}>
         WASD — Move &nbsp;&nbsp;|&nbsp;&nbsp; E — Interact
       </div>
     </div>

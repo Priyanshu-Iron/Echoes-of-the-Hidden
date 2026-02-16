@@ -1,7 +1,6 @@
 /**
- * HUD component — Heads-Up Display overlay for the game.
- * Shows suspicion meter, reputation, active mission, and system controls.
- * Uses shared style constants for the glassmorphism theme.
+ * HUD component — Heads-Up Display overlay.
+ * Frosted white glassmorphism theme with dark text.
  * @module components/UI/HUD
  */
 
@@ -57,10 +56,9 @@ const HUD = () => {
                         style={{
                             width: '220px',
                             height: '6px',
-                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            backgroundColor: 'rgba(0,0,0,0.08)',
                             borderRadius: '3px',
                             overflow: 'hidden',
-                            position: 'relative',
                         }}
                     >
                         <div style={{
@@ -69,7 +67,7 @@ const HUD = () => {
                             backgroundColor: suspicionColor,
                             borderRadius: '3px',
                             transition: 'width 0.3s ease, background-color 0.3s ease',
-                            boxShadow: `0 0 12px ${suspicionColor}40`,
+                            boxShadow: `0 0 8px ${suspicionColor}30`,
                         }} />
                     </div>
                 </div>
@@ -81,7 +79,7 @@ const HUD = () => {
                         <span style={monoValueStyle}>
                             {Math.round(reputation)}
                         </span>
-                        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>/ 100</span>
+                        <span style={{ fontSize: '0.7rem', color: 'rgba(30,41,59,0.35)' }}>/ 100</span>
                     </div>
                 </div>
             </div>
@@ -93,7 +91,7 @@ const HUD = () => {
                     aria-label={`Current objective: ${activeMission.title}. ${activeMission.description}`}
                     style={{
                         ...glassPanel,
-                        borderColor: 'rgba(255, 215, 0, 0.3)',
+                        borderColor: 'rgba(180, 83, 9, 0.25)',
                         maxWidth: '400px',
                         textAlign: 'center',
                     }}
@@ -110,14 +108,14 @@ const HUD = () => {
                     <div style={{
                         fontSize: '1rem',
                         fontWeight: 600,
-                        color: '#fff',
+                        color: '#1e293b',
                         marginBottom: '4px',
                     }}>
                         {activeMission.title}
                     </div>
                     <div style={{
                         fontSize: '0.8rem',
-                        color: 'rgba(255,255,255,0.6)',
+                        color: 'rgba(30,41,59,0.55)',
                     }}>
                         {activeMission.description}
                     </div>
@@ -130,7 +128,7 @@ const HUD = () => {
                 <button onClick={handleLoad} style={buttonStyle} aria-label="Load saved game">Load</button>
                 <button
                     onClick={handleReset}
-                    style={{ ...buttonStyle, color: '#ff6666', borderColor: 'rgba(255, 100, 100, 0.2)' }}
+                    style={{ ...buttonStyle, color: '#dc2626', borderColor: 'rgba(220, 38, 38, 0.2)' }}
                     aria-label="Reset game and clear save data"
                 >
                     Reset
