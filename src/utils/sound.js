@@ -66,11 +66,13 @@ class SoundManager {
         setTimeout(() => this.playTone(600, 'sawtooth', 0.4, 0.5), 100);
     }
 
-    /** 
-     * Play a "funny" guard chase sound 
+    /**
+     * Play a "funny" guard chase sound
      * Sirens!
      */
     playGuardChase() {
+        if (!this.initialized || this.isMuted) return;
+
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
